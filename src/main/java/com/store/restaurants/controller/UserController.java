@@ -18,6 +18,11 @@ import java.util.NoSuchElementException;
 public class UserController {
     @Autowired
     UserService userService;
+
+    @GetMapping("/")
+    public ResponseEntity<List<User>> getAllUsers(){
+        return getUsers();
+    }
     @GetMapping
     public ResponseEntity<List<User>> getUsers(){
         return ResponseEntity.ok(userService.getAllUsers());

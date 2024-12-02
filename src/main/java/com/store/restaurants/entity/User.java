@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 public class User {
-    public static enum Role {DEFAULT, OWNER, CUSTOMER, DELIVERY}
+    public enum Role {DEFAULT, OWNER, CUSTOMER, DELIVERY}
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

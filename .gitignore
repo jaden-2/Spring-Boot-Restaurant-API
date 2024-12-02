@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Important
+mvnw
+mvnw.cmd
+src/main/resources/
+

@@ -2,10 +2,10 @@ package com.store.restaurants.service;
 
 import com.store.restaurants.entity.User;
 import com.store.restaurants.repository.UserRepo;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -14,7 +14,7 @@ public class UserService {
     @Autowired
     private UserRepo userRepository;
 
-    public void createNewUser(User newUser) {
+    public void createNewUser(@NonNull User newUser) {
         userRepository.save(newUser);
     }
 
@@ -28,8 +28,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void updateUser(Integer id, User updateUser) throws NoSuchElementException {
-        User user = userRepository.findById(id).orElseThrow(()->new NoSuchElementException("User does not exist"));
+    public void updateUser(Integer id, @NonNull User updateUser) throws NoSuchElementException {
+        User user = userRepository.findById(id).orElseThrow(()->new NoSuchElementException("Cannot update user that does not exist"));
         user.setEmail(updateUser.getEmail());
         user.setRole(updateUser.getRole());
         user.setPassword(updateUser.getPassword());
