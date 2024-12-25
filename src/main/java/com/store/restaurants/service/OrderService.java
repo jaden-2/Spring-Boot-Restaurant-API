@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
+// Make corrections to the order service, make use of menu service as a reference guide.
 @Service
 public class OrderService {
     @Autowired
@@ -18,17 +20,15 @@ public class OrderService {
     }
 
     public Order getSpecificOrder(Integer orderId) throws NoSuchElementException{
-        Order order = orderRepo.findById(orderId).orElseThrow(()-> new NoSuchElementException("Cannot get order that does not exist"));
-
-        return  order;
+        return orderRepo.findById(orderId).orElseThrow(()-> new NoSuchElementException("Cannot get order that does not exist"));
     }
 
     public List<Order> getPendingOrders(){
-        return orderRepo.getPendingOrders();
+        return orderRepo.getPendingOrders(Order.Status.PENDING);
     }
 
     public List<Order> getCompletedOrder(){
-        return orderRepo.getCompletedOrders();
+        return orderRepo.getCompletedOrders(Order.Status.COMPLETED);
     }
 
     public void createOrder(Order newOrder){
