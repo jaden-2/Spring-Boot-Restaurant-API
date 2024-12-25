@@ -15,7 +15,7 @@ public class Delivery {
     @Column(name = "delivery_id")
     private Integer deliveryId;
 
-    @Column(name = "delivery_person")
+    @Column(name = "delivery_person_id")
     @NonNull
     private Integer deliveryPerson;
 }
