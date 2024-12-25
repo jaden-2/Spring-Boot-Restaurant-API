@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -14,25 +15,24 @@ import java.util.NoSuchElementException;
 public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
-    @GetMapping("/")
-    public ResponseEntity<List<Restaurant>> getAllRestaurants(){
-        return getRestaurants();
-    }
-    @GetMapping
-    public ResponseEntity<List<Restaurant>> getRestaurants(){
-        return ResponseEntity.ok(restaurantService.getRestaurants());
-    }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Integer id){
+    @GetMapping
+    public ResponseEntity<List<Restaurant>> getRestaurants(@RequestParam(value = "restId", required = false) Integer restId){
+        if (restId == null)
+            return ResponseEntity.ok(restaurantService.getRestaurants());
+
+        // Return the restaurant requested for
         Restaurant restaurant;
+        List<Restaurant> restaurantList = new ArrayList<>();
         try{
-            restaurant = restaurantService.getRestaurantById(id);
+            restaurant = restaurantService.getRestaurantById(restId);
         }
         catch (NoSuchElementException e){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(restaurant);
+
+        restaurantList.add(restaurant);
+        return ResponseEntity.ok(restaurantList);
     }
 
     @PostMapping
@@ -41,8 +41,8 @@ public class RestaurantController {
         return ResponseEntity.ok("Created");
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateRestaurant(@PathVariable Integer id, @ModelAttribute Restaurant updatedRestaurant){
+    @PutMapping
+    public ResponseEntity<String> updateRestaurant(@RequestParam("id") Integer id, @ModelAttribute Restaurant updatedRestaurant){
         try{
             restaurantService.updateRestaurant(id, updatedRestaurant);
         }catch (NoSuchElementException e){
@@ -51,8 +51,8 @@ public class RestaurantController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRestaurant(@PathVariable Integer id){
+    @DeleteMapping
+    public ResponseEntity<String> deleteRestaurant(@RequestParam("id") Integer id){
         try{
             restaurantService.DeleteRestaurant(id);
         }catch (NoSuchElementException e){
