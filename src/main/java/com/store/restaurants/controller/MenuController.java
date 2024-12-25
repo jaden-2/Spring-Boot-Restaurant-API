@@ -1,55 +1,59 @@
 package com.store.restaurants.controller;
 
 import com.store.restaurants.entity.Menu;
+import com.store.restaurants.entity.Message;
 import com.store.restaurants.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("restaurant/{restId}/menu")
+@RequestMapping("restaurant/menu")
 public class MenuController {
     @Autowired
     MenuService menuService;
 
     @GetMapping
-    public ResponseEntity<List<Menu>> getMenuitemsFromRestaurant(@PathVariable Integer restId){
-        return ResponseEntity.ok(menuService.getItemsFromRestaurant(restId));
+    public ResponseEntity<List<Menu>> getMenuitemsFromRestaurant(@RequestParam("storeId") Integer restId, @RequestParam(value = "menuId", required = false) Integer menuId){
+        if (menuId == null)
+            return ResponseEntity.ok(menuService.getItemsFromRestaurant(restId));
+        List<Menu> menuList = new ArrayList<>();
+        menuList.add(menuService.getSpecificItemFromRestaurant(menuId, restId));
+
+        return ResponseEntity.ok(menuList);
     }
 
-    @GetMapping("/{menuId}")
-    public ResponseEntity<Menu> getSpecificMenuItem(@PathVariable Integer restId, @PathVariable Integer menuId){
-        return ResponseEntity.ok(menuService.getSpecificItemFromRestaurant(menuId, restId));
-    }
-
-    @PutMapping("/{menuId}")
-    public ResponseEntity<String> updateMenu(@PathVariable Integer menuId, @ModelAttribute Menu updatedMenu){
+    @PutMapping
+    public ResponseEntity<String> updateMenu(@RequestParam("storeId") Integer restId, @RequestParam("menuId") Integer menuId, @ModelAttribute Menu updatedMenu){
         try{
-            menuService.updateMenu(menuId, updatedMenu);
+            menuService.updateMenu(restId, menuId, updatedMenu);
         }catch (NoSuchElementException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(String.valueOf(new Message(e.getLocalizedMessage())));
         }
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{menuId}")
-    public ResponseEntity<String> deleteMenuItem(@PathVariable Integer menuId){
+    @DeleteMapping
+    public ResponseEntity<Message> deleteMenuItem(@RequestParam("storeId") Integer restId, @RequestParam("menuId") Integer menuId){
         try{
-            menuService.deleteMenuItem(menuId);
+            menuService.deleteMenuItem(restId, menuId);
         }catch (NoSuchElementException e){
-            ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(new Message(e.getLocalizedMessage()));
         }
         return  ResponseEntity.noContent().build();
     }
     @PostMapping
-    public ResponseEntity<String> createMenuItem(@PathVariable Integer restId, @ModelAttribute Menu newMenu){
-        if(!restId.equals(newMenu.getRestaurantId())){
-            return ResponseEntity.badRequest().body("Cannot create menu outside restaurant");
+    public ResponseEntity<Message> createMenuItem(@RequestParam("storeId") Integer restId, @ModelAttribute Menu newMenu){
+        try{
+            menuService.createNewMenu(newMenu, restId);
+        }catch (InputMismatchException e){
+            return ResponseEntity.badRequest().body(new Message(e.getLocalizedMessage()));
         }
-        menuService.createNewMenu(newMenu);
 
         return ResponseEntity.accepted().build();
     }
