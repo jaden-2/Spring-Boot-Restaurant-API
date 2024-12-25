@@ -3,6 +3,7 @@ package com.store.restaurants.repository;
 import com.store.restaurants.entity.Menu;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +18,11 @@ public interface MenuRepo extends JpaRepository<Menu, Integer> {
     Menu findSpecificItemFromRestaurant(@Param("menuId") Integer menuId, @Param("restaurantId") Integer restaurantId);
     @Query("SELECT m from Menu m where m.restaurantId = :restaurantId AND m.price = :price")
     List<Menu> getMenuByPrice(@Param("price") Double price, @Param("restaurantId") Integer restaurantID);
+
+    // Checks that menu item corresponds to restaurantId
+    @Query("SELECT COUNT(m) > 0 FROM Menu m where m.menuId = :menuId AND m.restaurantId = :restId")
+    boolean existsByRestaurantIdAndMenuId(@Param("restId") Integer restId, @Param("menuId") Integer menuId);
+
+
 }
 
