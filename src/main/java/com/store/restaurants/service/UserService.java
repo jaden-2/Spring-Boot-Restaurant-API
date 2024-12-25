@@ -45,4 +45,8 @@ public class UserService {
         else throw new NoSuchElementException("User does not exist");
 
     }
+
+    public boolean userExistsById(Integer userId) {
+        return userRepository.existsById(userId);
+    }
 }

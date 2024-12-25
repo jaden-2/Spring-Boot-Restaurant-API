@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -19,23 +20,23 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> getAllUsers(){
-        return getUsers();
-    }
     @GetMapping
-    public ResponseEntity<List<User>> getUsers(){
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id){
+    public ResponseEntity<List<User>> getUsers(@RequestParam(value = "id", required = false) Integer id){
+        // Returns a list of all users
+        if(id == null)
+            return ResponseEntity.ok(userService.getAllUsers());
+
         User user;
+        List<User> users = new ArrayList<>();
+        // In case user does not exist
         try{
             user = userService.getUserbyId(id);
         } catch (NoSuchElementException e){
             return ResponseEntity.badRequest().body(null);
         }
-        return ResponseEntity.ok(user);
+        users.add(user);
+
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping
@@ -45,8 +46,8 @@ public class UserController {
 
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Integer id, @ModelAttribute User updateUser){
+    @PutMapping
+    public ResponseEntity<String> updateUser(@RequestParam("id") Integer id, @ModelAttribute User updateUser){
         try{
             userService.updateUser(id, updateUser);
         }catch (NoSuchElementException e){
@@ -56,8 +57,8 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer id){
+    @DeleteMapping
+    public ResponseEntity<String> deleteUser(@RequestParam("id") Integer id){
         try{
             userService.deleteUser(id);
         }catch (NoSuchElementException e){

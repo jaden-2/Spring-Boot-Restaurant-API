@@ -1,11 +1,15 @@
 package com.store.restaurants.service;
 
 import com.store.restaurants.entity.Restaurant;
+import com.store.restaurants.entity.RestaurantOwners;
+import com.store.restaurants.repository.RestaurantOwnersRepo;
 import com.store.restaurants.repository.RestaurantRepo;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -21,7 +25,6 @@ public class RestaurantService {
     public Restaurant getRestaurantById(Integer id) throws NoSuchElementException {
         return restaurantRepo.findById(id).orElseThrow(()-> new NoSuchElementException("Restaurant does not exist"));
     }
-
     public void createRestaurant(@NonNull Restaurant restaurant){
         restaurantRepo.save(restaurant);
     }
@@ -42,4 +45,14 @@ public class RestaurantService {
             restaurantRepo.deleteById(id);
         else throw new NoSuchElementException("Cannot delete restaurant that does not exist");
     }
+
+    // Restaurant owners, getting information about restaurants and their owners
+    @Autowired
+    private RestaurantOwnersService restaurantOwnersService;
+
+    public List<Restaurant> getRestaurantsByOwner(Integer ownerId){
+        List<Integer> restaurants = restaurantOwnersService.getRestaurantByOwner(ownerId);
+        return restaurantRepo.findAllById(restaurants);
+    }
+
 }
